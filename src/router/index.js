@@ -5,7 +5,8 @@ import VueRouter from 'vue-router'
 
 // 在vuecli创建的项目中 @表示src
 // 它是src目录的路径别名
-import Login from '@/views/login/index.vue'
+import Login from '@/views/login/'
+import Home from '@/views/home/'
 
 Vue.use(VueRouter)
 
@@ -16,6 +17,12 @@ const routes = [
     path:'/login',
     name:'login',
     component:Login
+  },
+  // 首页的路由
+  {
+    path:'/',
+    name:'home', //路由的名字
+    component:Home
   }
 ]
 
