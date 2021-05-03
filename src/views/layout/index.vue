@@ -16,8 +16,8 @@
         <el-dropdown>
           <!-- 用户头像区域 -->
           <div class="avatar-wrap">
-            <img class="avatar" src="../../assets/icon.jpg" alt="">
-            <span>用户昵称</span>
+            <img class="avatar" :src="user.photo" alt="" />
+            <span>{{user.name}}</span>
             <i class="el-icon-arrow-down el-icon--right"></i>
           </div>
           <!-- 用户下拉菜单区域 -->
@@ -45,6 +45,7 @@
 <script>
 // 引入侧边栏子组件
 import AppAside from "./components/aside";
+import {getUserProfile} from '@/api/user'
 
 export default {
   name: "LayoutIndex",
@@ -53,9 +54,25 @@ export default {
     AppAside,
   },
   data() {
-    return {};
+    return {
+      user:{},  //当前登录用户信息
+    };
   },
-  methods: {},
+  // 初始化的时候做请求加载loadUserProfile这个方法
+  created(){
+    // 组件初始化好后，请求获取用户资料
+    this.loadUserProfile()
+  },
+  methods: {
+    // 除了登录接口，其他所有接口都需要授权才能请求使用
+    // 其他所有接口都需要提供用户的身份令牌才能获取数据
+    loadUserProfile(){
+      getUserProfile().then(res => {
+        console.log(res)
+        this.user = res.data.data
+      })
+    }
+  },
 };
 </script>
 
@@ -84,10 +101,10 @@ export default {
 .main {
   background-color: #e9eef3;
 }
-.avatar-wrap{
+.avatar-wrap {
   display: flex;
   align-items: center;
-  .avatar{
+  .avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
