@@ -4,7 +4,7 @@
     <!-- 配置 Form 表单验证：
         1.必须给el-form组件绑定model为表单数据对象 :model="user" //动态绑定v-bind
         2.给需要验证的表单项el-form-item绑定prop属性，prop的值为表单数据中的字段 prop="mobile"
-          注意：prop属性需要指定表单对象中的数据名称
+          注意：prop属性需要指定表单对象中的数据名称，同名
         3.通过el-form组件的rules属性配置验证规则 :rules="fotmRules"
 
         手动触发表单验证：
@@ -68,6 +68,8 @@ export default {
             message: "请输入正确的号码格式",
             trigger: "blur",
           },
+          // trigger: 是用来配置触发校验的时机，有两个选项，
+          // change是当输入的内容发送变化的时候，blur是当失去焦点的时候
         ],
         code: [
           { required: true, message: "请输入验证码", trigger: "blur" },
@@ -83,11 +85,16 @@ export default {
             // 自定义校验规则
             // 验证通过：callback()
             // 验证失败：callback(new Error('请再次输入密码'));
+            // validator验证函数不是自己来调用的，而是当element表单触发验证的时候自己内部调用的
+            // 所以只需要提供校验函数的处理逻辑就可以了
+            // 通过callback()
             validator: (rule, value, callback) => {
-              console.log(value); //boolean
+              // console.log(value); //boolean
               if (value) {
+                // 验证通过
                 callback();
               } else {
+                // 验证失败
                 callback(new Error("请同意用户协议"));
               }
             },
@@ -128,7 +135,7 @@ export default {
       // 建议：把所有请求封装成函数然后统一的组织到模块中进行管理，这样做的好处：管理维护重用更方便
       login(this.user) //11.login()方法中的参数就是请求体中的this.user，
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           // 登录成功
           this.$message({
             message: "登录成功",
@@ -136,6 +143,14 @@ export default {
           })
           //关闭登录中loading
           this.loginLoading = false; 
+
+          // 将接口返回的用户相关数据放到本地存储，方便应用数据共享
+          // 使用localStorage.setItem去存储user
+          // user：当前登录用户，res.data.data：用户的信息
+          // 本地存储只能存储字符串,
+          // 如果需要存储对象、数组类型的数据，则把他们转为JSON格式字符串进行存储
+          window.localStorage.setItem('user',JSON.stringify(res.data.data))
+
           // 跳转到首页
           // this.$router.push('/')
           this.$router.push({
@@ -143,9 +158,12 @@ export default {
           })
         })
         .catch((err) => {
-          console.log("登录失败！", err);
+          // console.log("登录失败！", err);
           // 登录失败
           this.$message.error("登录失败，手机号或验证码错误");
+
+          //关闭登录中loading
+          this.loginLoading = false; 
         });
     },
   },

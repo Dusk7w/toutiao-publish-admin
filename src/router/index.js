@@ -30,10 +30,10 @@ const routes = [
     children: [
       // 首页的路由 （子路由）
       {
-        path: '', //path为空，会作为默认子路由渲染
+        path: '', //path为空，layout会作为默认子路由渲染
         name: 'home', //路由的名字
         component: Home
-      }
+      },
     ]
   },
 
