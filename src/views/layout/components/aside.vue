@@ -3,15 +3,17 @@
   <!-- router：是否使用 vue-router 的模式，
 启用该模式会在激活导航时以 index 作为 path 进行路由跳转 -->
   <!--default-active="/" 默认激活菜单的 index -->
+  <!-- :collapse="isCollapse"侧边栏折叠与展开 -->
   <el-menu
-  class="nav-menu"
+    class="nav-menu"
     default-active="/"
     background-color="#002033"
     text-color="#fff"
     active-text-color="#ffd04b"
     router
+    :collapse="isCollapse"
   >
-    <h2 class="menu-title">头条发布系统</h2>
+    <!-- <h2 class="menu-title">头条发布系统</h2> -->
     <el-menu-item index="/">
       <i class="el-icon-s-home"></i>
       <span slot="title">首页</span>
@@ -46,20 +48,25 @@
 <script>
 export default {
   name: "AppAside",
+  // 父组件index.vue传isCollapse的值给子组件aside.vue
+  // 把props中的数据动态绑定到el-menu组件的:collapse="isCollapse"上
+  props:['is-collapse'],
   data() {
-    return {};
+    return {
+      // isCollapse:true,
+    };
   },
   methods: {},
 };
 </script>
 
 <style scoped lang="less">
-.menu-title{
-  color: #fff;
-  text-align: center;
-}
-.nav-menu{
-  .iconfont{
+// .menu-title {
+//   color: #fff;
+//   text-align: center;
+// }
+.nav-menu {
+  .iconfont {
     margin-right: 10px;
     padding-left: 5px;
   }

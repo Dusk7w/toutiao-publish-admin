@@ -8,6 +8,9 @@ export default {
   data(){
     return{}
   },
+  // 使用路由导航守卫处理页面访问权限
+  created(){
+  },
   methods: {},
 }
 </script>
