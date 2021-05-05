@@ -8,6 +8,7 @@ import VueRouter from 'vue-router'
 import Login from '@/views/login/'
 import Home from '@/views/home/'
 import Layout from '@/views/layout/'
+import Article from '@/views/article/'
 
 Vue.use(VueRouter)
 
@@ -34,6 +35,11 @@ const routes = [
         name: 'home', //路由的名字
         component: Home
       },
+      {
+        path: '/article', 
+        name: 'article', 
+        component: Article
+      },
     ]
   },
 
@@ -42,6 +48,9 @@ const routes = [
 const router = new VueRouter({
   routes
 })
+
+// 路由导航守卫（拦截器）的作用就是控制页面的访问状态
+// beforeEach：全局前置守卫，任何页面的访问都要经过这里
 
 // 路由导航守卫：所有页面的导航都会经过这里
 // 守卫页面的导航的
@@ -52,14 +61,13 @@ router.beforeEach((to,from,next) => {
   // 如果要访问的页面 不是/login，校验登录状态
   // 如果没有登录，则跳转到登录页面
   // 如果登录了，则允许通过
-  // 允许通过
-  // next()
+  // 允许通过 调用next()方法
 
   const user = JSON.parse(window.localStorage.getItem('user'))
   // 校验非登录页面的登录状态
   if(to.path !== '/login'){
     if(user){
-      next()
+      next()  //  不需要传参
     }else{
       // 没有登录，跳转到登录页面
       next('/login')

@@ -2,7 +2,7 @@
  * 用户相关的请求模块
  */
 
-import request from "@/utils/request";
+import request from "@/utils/request"
 
 // 用户登录
 export const login = data => { //22.data形参去接收login(this.user)传来的参数
