@@ -40,7 +40,7 @@
 
         <el-form-item label="日期">
           <!--format 显示在输入框中日期的样式 yyyy-MM-dd 年月日 
-              value-format 显示获取到的日期的样式-->
+              value-format 显示获取到的 选中值 日期的样式-->
           <el-date-picker
             v-model="rangeDate"
             type="datetimerange"
@@ -57,7 +57,9 @@
           <!-- button按钮的click事件有一个默认参数
             当你没有指定参数的时候，它会默认传递一个没用的数据-->
           <!-- 点击查询时 重新加载 -->
-          <el-button type="primary" @click="loadArticles(1)">查询</el-button>
+          <el-button type="primary" @click="loadArticles(1)" :disabled="loading"
+            >查询</el-button
+          >
         </el-form-item>
       </el-form>
       <!-- /数据筛选 表单 -->
@@ -86,6 +88,7 @@
         stripe
         size="mini"
         class="list-rable"
+        v-loading="loading"
       >
         <el-table-column prop="date" label="封面">
           <template slot-scope="scope">
@@ -97,7 +100,7 @@
               fit="cover"
               lazy
             >
-            <!-- 图片加载期间展示一些东西 自定义 placeholder 插槽的名称-->
+              <!-- 图片加载期间展示一些东西 自定义 placeholder 插槽的名称-->
               <div slot="placeholder" class="image-slot">
                 加载中<span class="dot">...</span>
               </div>
@@ -142,9 +145,15 @@
         <el-table-column prop="pubdate" label="发布时间"> </el-table-column>
         <el-table-column label="操作">
           <!-- 如果需要自定义表格列模板，则需要把自定义的内容放到 template里面-->
-          <template>
+         <!-- slot-scope="scope" scope.row.id拿到当前遍历项中的articleId -->
+          <template slot-scope="scope">
             <el-button type="primary" icon="el-icon-edit" circle></el-button>
-            <el-button type="danger" icon="el-icon-delete" circle></el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              circle
+              @click="onDeleteArticle(scope.row.id)"
+            ></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -153,12 +162,16 @@
       <!-- 列表分页 -->
       <!-- total 用来设定总数据的条数 默认按照10条每页计算总页码
       page-size 每页显示条目个数 默认10条 -->
+      <!-- loading为true 表示禁用 ；loading 为false 表示不禁用 -->
+      <!-- :current-page.sync 修饰符 能够实时更新当前页码 同步page数据-->
       <el-pagination
+        background
         @current-change="onCurrentChange"
         :page-size="pageSize"
         layout="prev, pager, next"
         :total="totalCount"
-        background
+        :disabled="loading"
+        :current-page.sync="page"
       />
       <!-- /列表分页 -->
     </el-card>
@@ -167,7 +180,7 @@
 </template>
 
 <script>
-import { getArticles, getArticlesChannels } from "@/api/article";
+import { getArticles, getArticlesChannels, deleteArticle } from "@/api/article";
 
 export default {
   name: "ArticleIndex",
@@ -197,7 +210,9 @@ export default {
       status: null, //查询文章的状态，不传null就是全部 //通过状态单选按钮来改变状态
       channels: [], //文章频道列表
       channelId: null, //查询文章的频道，v-model绑定到下拉列表中
-      rangeDate:[], //筛选的范围日期
+      rangeDate: null, //筛选的范围日期 默认null查询所有
+      loading: true, //表格数据加载中 loading
+      page:1, //当前页码
     };
   },
   // 生命周期中调用 loadArticles()方法获取数据
@@ -208,6 +223,8 @@ export default {
   },
   methods: {
     loadArticles(page = 1) {
+      // 数据请求一开始，展示加载中的loading
+      this.loading = true;
       //初始值page默认为1
       // 获取文章列表的方法
       getArticles({
@@ -216,24 +233,64 @@ export default {
         per_page: this.pageSize,
         status: this.status, //status受单选按钮影响
         channel_id: this.channelId, //对象的名字是后端要求的，对象的值需要驼峰，值还没有，需要在data中初始化
-        begin_pubdate:this.rangeDate[0],  //开始日期
-        end_pubdate:this.rangeDate[1],  //截止日期
+        begin_pubdate: this.rangeDate ? this.rangeDate[0] : null, //开始日期
+        end_pubdate: this.rangeDate ? this.rangeDate[1] : null, //截止日期
       }).then((res) => {
         // console.log(res);
         const { results, total_count: totalCount } = res.data.data; //解构赋值，重命名total_count
         this.articles = res.data.data.results; //文章数据列表
         this.totalCount = totalCount;
+        // 数据请求结束后，关闭加载中的loading
+        this.loading = false;
       });
     },
-    // 事件处理函数，有一个回调参数page
+
+    // 分页列表 事件处理函数，有一个回调参数page
     onCurrentChange(page) {
       this.loadArticles(page); //重新调用this.loadArticles，传当前改变的页码
     },
+
+    // 加载文章频道列表事件
     loadChannels() {
       getArticlesChannels().then((res) => {
         // console.log(res);
         this.channels = res.data.data.channels;
       });
+    },
+
+    // 删除事件
+    onDeleteArticle(articleId) {  //articleId声明接收，传给请求方法deleteArticle(要删除文章的id)
+      // console.log("onDeleteArticle")
+      // 找到数据接口
+      // 封装请求方法
+      // 删除请求调用
+      // 处理响应结果
+
+      console.log(articleId);
+      console.log(articleId.toString());
+
+      this.$confirm("确认删除吗?", "删除提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          //  确认 执行这里
+          // deleteArticle(要删除文章的id)
+          deleteArticle(articleId.toString()).then(res => {
+            // console.log(res);
+            // 删除成功，更新当前页的文章数据列表
+            // this.loadArticles(页码)
+            this.loadArticles(this.page)  //第几页删除 就更新第几页列表
+          })
+
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          })
+        })
     },
   },
 };

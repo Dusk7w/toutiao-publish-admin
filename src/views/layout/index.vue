@@ -98,16 +98,16 @@ export default {
       })
         .then(() => {
           // 把用户的登录状态清除，
-          window.localStorage.removeItem("user");
+          window.localStorage.removeItem("user")
           // 跳转到登录页面
-          this.$router.push("/login");
+          this.$router.push("/login")
         })
         .catch(() => {
           this.$message({
             type: "info",
             message: "已取消退出",
-          });
-        });
+          })
+        })
 
       // // console.log("onLogout");
       // // 把用户的登录状态清除，
