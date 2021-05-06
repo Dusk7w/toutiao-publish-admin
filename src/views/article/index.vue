@@ -147,7 +147,14 @@
           <!-- 如果需要自定义表格列模板，则需要把自定义的内容放到 template里面-->
          <!-- slot-scope="scope" scope.row.id拿到当前遍历项中的articleId -->
           <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" circle></el-button>
+            <el-button type="primary" icon="el-icon-edit" circle
+            @click="$router.push('/publish?id=' + scope.row.id)"
+            ></el-button>
+            <!-- 点击编辑按钮进行路由跳转，编辑和发布共用一个组件
+            根据文章的id发请求获取数据，把id作为参数传进来，拼接起来-->
+            <!-- 客户端 通过 查询字符串的方式进行 路由传参 -->
+            <!-- 任何数据和字符串拼接 都会自动的toString() -->
+            <!-- 在publish组件中拿着id去请求加载 这个id的文章内容-->
             <el-button
               type="danger"
               icon="el-icon-delete"

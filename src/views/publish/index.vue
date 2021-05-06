@@ -54,7 +54,7 @@
 
 <script>
 // 1.获取频道列表接口
-import { getArticlesChannels, addArticle } from "@/api/article";
+import { getArticlesChannels, addArticle ,updateArticle,getArticle} from "@/api/article";
 
 export default {
   name: "PublishIndex",
@@ -77,7 +77,14 @@ export default {
   },
   // 3.在初始化钩子函数中调用加载频道函数 loadChannels()
   created() {
-    this.loadChannels();
+    this.loadChannels() //加载频道
+
+    // 发布和编辑使用的同一个组件，所以这里要判断
+    // 如果路由路径参数中 有id 则请求展示文章内容
+    // if页面路由路径中有$route.query.id这个参数，表示编辑文章
+    if(this.$route.query.id){
+      this.loadArticle()  //加载获取文章
+    }
   },
   methods: {
     // 4.在方法中，写loadChannels()这个方法，来请求获取数据
@@ -123,6 +130,21 @@ export default {
         })
       })
     },
+
+    // 修改文章：加载文章内容
+    loadArticle(){
+      // 找到数据接口
+      // 封装请求方法
+      // 请求获取数据
+      getArticle(this.$route.query.id).then(res => {
+        // console.log(res);
+        // 数据绑定展示
+        this.article = res.data.data
+      })
+      // 模板绑定展示
+      // console.log('loadArticle');
+
+    }
   },
 };
 </script>

@@ -68,3 +68,53 @@ transformResponse: [function (data) {
 -接口的参数
 -通过表单的交互得到接口参数
 
+9.axios
+//Method请求方法，常见的有:
+GET（ 一般用于查询）、
+POST（一般用于添加）、
+PUT（一般用于修改，完整替换）、
+DELETE（一般用于删除操作）、
+PATCH （一般用于修改操作，局部修改），从使用角度不用关心为什么，因为这是后端设计的，我们决定不了。
+
+axios({
+  //请求方法
+  method：'post',   
+
+  //PATH请求路径
+  url：'请求路径',  
+
+  //请求路径中的：xxx 表示路径参数
+  //使用的时候需要指定参数，把数据值替换掉:xxx，这个参数是拼接到url路径中的
+  url：'/mp/v1_0/articles/:target",
+
+  url：'/mp/v1_0/articles/1",
+  url：'/mp/v1_0/articles/2",
+
+  //在axios中通过headers选项设置请求头参数
+  headers:{
+    //名字：值
+    //因为axios发送的请求默认会设置'Content-Type':application/json'
+    Content-Type：'application/json
+    <!--添加用户身份的代码 放在请求拦截器中 统一处理 -->
+    Authorization:用户token
+  }
+
+  //axios中通过data选项设置Body请求体参数
+  data：{
+      mobile:'',
+      code:''
+  }
+
+  //axios中通过params选项设置Query参数
+  //Query参数也叫查询参数
+  //如果有Query参数，axios会在内部把这个对象转为key=value&key=value的数据格式，然后以？分割频道的ur1的后面传递给接口。
+  params:{
+    status:2
+  }
+})
+
+请求参数：
+  -请求头Headers
+  -查询参数Query
+  -请求体Body
+  -路径参数
