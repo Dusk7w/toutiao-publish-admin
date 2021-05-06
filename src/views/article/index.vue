@@ -166,9 +166,9 @@
       <!-- :current-page.sync 修饰符 能够实时更新当前页码 同步page数据-->
       <el-pagination
         background
+        layout="prev, pager, next"
         @current-change="onCurrentChange"
         :page-size="pageSize"
-        layout="prev, pager, next"
         :total="totalCount"
         :disabled="loading"
         :current-page.sync="page"
@@ -189,12 +189,7 @@ export default {
     return {
       form: {
         name: "",
-        region: "",
-        date1: "",
-        delivery: false,
         type: [],
-        resource: "",
-        desc: "",
       },
       articles: [], //文章数据列表
       // 文章状态数组

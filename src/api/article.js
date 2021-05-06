@@ -35,3 +35,20 @@ export const deleteArticle = articleId => {
     // 根据文章id删除指定文章 ES6拼接
   })
 }
+
+//  新建文章
+// 第二个参数不传 默认为 false 不存为草稿
+export const addArticle = (data,draft = false) => {
+  return request({
+    method:'POST',
+    url:'/mp/v1_0/articles',
+    // Query 参数
+    params:{
+      // draft:draft  //同名简写
+      draft //是否存为草稿，true为草稿
+    },
+    // 请求体 body 数据
+    // data:data
+    data
+  })
+}
