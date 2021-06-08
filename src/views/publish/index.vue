@@ -14,12 +14,17 @@
       </div>
       <!-- 表单区域 -->
       <!-- :model="article" 只有在做表单验证的时候才是必须的 -->
-      <el-form ref="form" :model="article" label-width="80px">
-        <el-form-item label="标题">
+      <el-form
+        ref="publish-form"
+        :model="article"
+        :rules="formRules"
+        label-width="60px"
+      >
+        <el-form-item label="标题" prop="title">
           <el-input v-model="article.title"></el-input>
         </el-form-item>
 
-        <el-form-item label="内容">
+        <el-form-item label="内容" prop="content">
           <!-- 富文本编辑器 -->
           <el-tiptap
             v-model="article.content"
@@ -39,7 +44,7 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="频道">
+        <el-form-item label="频道" prop="channel_id">
           <!-- 7.v-for 遍历 渲染 :lable :value 动态绑定值-->
           <el-select v-model="article.channel_id" placeholder="请选择频道">
             <el-option
@@ -138,17 +143,17 @@ export default {
             // console.log(file);
 
             //通过FormData构造函数创建一个空对象
-            // 使用 append() 方法向该对象里添加字段 
-            const fd = new FormData()
+            // 使用 append() 方法向该对象里添加字段
+            const fd = new FormData();
             // 构建上传文件的表单对象，类型image，值file
-            fd.append("image", file)
+            fd.append("image", file);
             // 把uploadImage的结果返回给uploadRequest（）函数
             // 第1个return返回Promise对象，因为axios本身所有的then都是返回Promise
             return uploadImage(fd).then((res) => {
               // console.log(res);
               // 第2个return返回最后的结果
-              return res.data.data.url
-            }) // 图片的上传方法，返回一个Promise<url>
+              return res.data.data.url;
+            }); // 图片的上传方法，返回一个Promise<url>
           },
         }),
         new Underline(), // 下划线
@@ -167,6 +172,32 @@ export default {
       ],
       // 把上传的图片转为base64编码的纯文本的内容，上传到服务器，浏览器会识别并解析还原为图片
       // 图片是和整个文章内容以文本的形式保存在一起的
+      formRules: {
+        title: [
+          { required: true, message: "请输入文章标题", trigger: "blur" },
+          { min: 5, max: 30, message: "长度在5到30个字符", trigger: "blur" },
+        ],
+        content: [
+          // { required: true, message: "请输入文章内容", trigger: "change" },
+          // {
+          //   //自定义校验规则
+          //   validator(rule, value, callback) {
+          //     console.log('validator');
+          //     if (value === "<p></p>") {
+          //       // 验证失败
+          //       callback(new Error("请输入文章内容"));
+          //     } else {
+          //       // 验证通过
+          //       callback();
+          //     }
+          //   },
+          // },
+          { required: true, message: "请输入文章内容", trigger: "blur" },
+        ],
+        channel_id: [
+          { required: true, message: "请选择文章频道"},
+        ],
+      },
     };
   },
   // 3.在初始化钩子函数中调用加载频道函数 loadChannels()
@@ -209,39 +240,47 @@ export default {
 
     // 9.发表文章事件方法，
     onPublish(draft = false) {
-      // console.log("submit!");
-      // 找到数据接口
-      // 封装请求方法
-      // 请求提交表单
+      this.$refs['publish-form'].validate(valid => {
+        // 验证失败，停止提交表单
+        if (!valid) {
+          return;
+        }
+        // 验证通过，提交表单
 
-      // 判断，如果是修改文章，则执行修改操作，否则执行添加操作
-      const articleId = this.$route.query.id;
-      if (articleId) {
-        // 执行修改操作
-        updateArticle(articleId, this.article, draft).then((res) => {
-          console.log(res);
-          this.$message({
-            message: `${draft ? "存入草稿" : "发布"}成功`,
-            type: "success",
-          });
-          // 编辑成功后，跳转到内容管理界面
-          this.$router.push("/article");
-        });
-      } else {
-        // 执行添加操作
+        // console.log("submit!");
+        // 找到数据接口
+        // 封装请求方法
+        // 请求提交表单
 
-        //参数为article表单数据，就是提交的请求体 body
-        addArticle(this.article, draft).then((res) => {
-          // 处理响应结果
-          // console.log(res)
-          this.$message({
-            message: `${draft ? "存入草稿" : "发布"}成功`,
-            type: "success",
+        // 判断，如果是修改文章，则执行修改操作，否则执行添加操作
+        const articleId = this.$route.query.id;
+        if (articleId) {
+          // 执行修改操作
+          updateArticle(articleId, this.article, draft).then((res) => {
+            console.log(res);
+            this.$message({
+              message: `${draft ? "存入草稿" : "发布"}成功`,
+              type: "success",
+            });
+            // 编辑成功后，跳转到内容管理界面
+            this.$router.push("/article");
           });
-          // 发布成功后，跳转到内容管理界面
-          this.$router.push("/article");
-        });
-      }
+        } else {
+          // 执行添加操作
+
+          //参数为article表单数据，就是提交的请求体 body
+          addArticle(this.article, draft).then((res) => {
+            // 处理响应结果
+            // console.log(res)
+            this.$message({
+              message: `${draft ? "存入草稿" : "发布"}成功`,
+              type: "success",
+            });
+            // 发布成功后，跳转到内容管理界面
+            this.$router.push("/article");
+          });
+        }
+      });
     },
 
     // 修改文章：加载文章内容
