@@ -17,6 +17,16 @@ export const uploadImage = data => {
   })
 }
 
+// 获取素材列表
+export const getImages = params => {
+  return request({
+    method:'GET',
+    url:'/mp/v1_0/user/images',
+    params
+  })
+}
+
+
 /**
  * FormData的主要用途有两个：
 1、将form表单元素的name与value进行组合，实现表单数据的序列化，从而减少表单元素的拼接，提高工作效率。
